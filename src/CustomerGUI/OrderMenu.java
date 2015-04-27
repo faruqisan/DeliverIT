@@ -18,57 +18,19 @@ import net.proteanit.sql.DbUtils;
  */
 public class OrderMenu extends javax.swing.JFrame {
 
-    public static String userSession="admin";
+    public static String userSession ;
     CustomerDAO dao = new CustomerDAO();
 
     public OrderMenu(String newCustomer) throws SQLException {
         Customer customer = dao.setCustomerData(newCustomer);
         initComponents();
+        setLocationRelativeTo(null);
         welcomeLabel.setText(welcomeLabel.getText() + customer.getName());
         emailLabel.setText(customer.geteMail());
         dao.setTableData(newCustomer, orderTable);
-    }
-/**    
-    private void setTableData(String newUserSession) throws SQLException {
-        KoneksiMySQL k = new KoneksiMySQL();
-        Connection c = k.getConnection();
-        Statement st = c.createStatement();
-        String sql = "SELECT `order_id`, `order_date`, `oder_type`, `order_pickup_address`, `oder_destination_address`, `order_goods_type`, `order_goods_amount`, `order_status` FROM `deliverit_main`.`order_data` WHERE `userOrdered` LIKE '" + newUserSession + "'";
-        ResultSet rs = st.executeQuery(sql);
-
-        orderTable.setModel(DbUtils.resultSetToTableModel(rs));
-        orderTable.getColumnModel().getColumn(0).setHeaderValue("Order ID");
-        orderTable.getColumnModel().getColumn(1).setHeaderValue("Order Date");
-        orderTable.getColumnModel().getColumn(2).setHeaderValue("Order Type");
-        orderTable.getColumnModel().getColumn(3).setHeaderValue("Pickup Address");
-        orderTable.getColumnModel().getColumn(4).setHeaderValue("Destination Address");
-        orderTable.getColumnModel().getColumn(5).setHeaderValue("Goods Type");
-        orderTable.getColumnModel().getColumn(6).setHeaderValue("Goods Amount");
-        orderTable.getColumnModel().getColumn(7).setHeaderValue("Order Status");
-
-    }
-    
-    private Customer setCustomerData(String newUserSession) throws SQLException {
-        KoneksiMySQL k = new KoneksiMySQL();
-        Connection c = k.getConnection();
-        Statement st = c.createStatement();
-
-        Customer cust = new Customer();
-        String sql = "SELECT * FROM `customer_data` WHERE `username` LIKE '" + newUserSession + "' ORDER BY `customer_id` ASC";
-        ResultSet rs = st.executeQuery(sql);
-        while (rs.next()) {
-            cust.setName(rs.getString("nama"));
-            cust.seteMail(rs.getString("email"));
-            cust.setAddress(rs.getString("address"));
-            cust.setPhoneNumber(rs.getString("phoneNumber"));
-
-        }
-
-        return cust;
-
-    }
-**/
-    
+        orderTable.setShowHorizontalLines(false);
+    }     
+     
     private void submitOrderData(String newUserSession) {
         try {
             int goodsamount = Integer.parseInt(textGoodsAmount.getText());
@@ -110,20 +72,25 @@ public class OrderMenu extends javax.swing.JFrame {
         }
 
     }
-    
-    private void cancelOrder(String newUserSession) throws SQLException{
-        String orderID=orderTable.getValueAt(orderTable.getSelectedRow(), 0).toString();        
-        int pilihanUser = JOptionPane.showConfirmDialog(rootPane, "Delete This Order ? "+"\nOrderID = "+orderID);
-        
-        if(pilihanUser==0){
-            KoneksiMySQL k = new KoneksiMySQL();
-            Connection c = k.getConnection();
-            Statement st = c.createStatement();
-            String sql="DELETE FROM `deliverit_main`.`order_data` WHERE `order_data`.`order_id` ="+orderID;
-            st.execute(sql);
-            JOptionPane.showMessageDialog(rootPane, "Data Deleted Succesfully");
-            dao.setTableData(newUserSession,orderTable);
+
+    private void cancelOrder(String newUserSession) throws SQLException {
+        if (orderTable.getSelectedRow()== -1) {
+            JOptionPane.showMessageDialog(rootPane, "Data not selected");
+        } else {
+            String orderID = orderTable.getValueAt(orderTable.getSelectedRow(), 0).toString();
+            int pilihanUser = JOptionPane.showConfirmDialog(rootPane, "Delete This Order ? " + "\nOrderID = " + orderID);
+
+            if (pilihanUser == 0) {
+                KoneksiMySQL k = new KoneksiMySQL();
+                Connection c = k.getConnection();
+                Statement st = c.createStatement();
+                String sql = "DELETE FROM `deliverit_main`.`order_data` WHERE `order_data`.`order_id` =" + orderID;
+                st.execute(sql);
+                JOptionPane.showMessageDialog(rootPane, "Data Deleted Succesfully");
+                dao.setTableData(newUserSession, orderTable);
+            }
         }
+
     }
 
     public void clearOrderForm() {
@@ -185,6 +152,7 @@ public class OrderMenu extends javax.swing.JFrame {
         btnClear = new javax.swing.JButton();
         jButton1 = new javax.swing.JButton();
         labelInformationStatus = new javax.swing.JLabel();
+        cmbBoxGoodsUnit = new javax.swing.JComboBox();
         welcomeLabel = new javax.swing.JLabel();
         emailLabel = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
@@ -193,6 +161,7 @@ public class OrderMenu extends javax.swing.JFrame {
         btnRefresh = new javax.swing.JButton();
         btnCancelOrder = new javax.swing.JButton();
         jLabel3 = new javax.swing.JLabel();
+        btnLogOut = new javax.swing.JButton();
 
         orderForm.setTitle("Deliver IT | Order Form");
         orderForm.setBounds(new java.awt.Rectangle(0, 0, 0, 0));
@@ -247,7 +216,7 @@ public class OrderMenu extends javax.swing.JFrame {
                 textGoodsAmountMouseExited(evt);
             }
         });
-        orderForm.getContentPane().add(textGoodsAmount, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 105, 101, -1));
+        orderForm.getContentPane().add(textGoodsAmount, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 105, 42, -1));
 
         txtPickupAddress.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseEntered(java.awt.event.MouseEvent evt) {
@@ -299,9 +268,13 @@ public class OrderMenu extends javax.swing.JFrame {
         labelInformationStatus.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
         orderForm.getContentPane().add(labelInformationStatus, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 200, 220, 20));
 
+        cmbBoxGoodsUnit.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Box", "Unit", "Ton" }));
+        orderForm.getContentPane().add(cmbBoxGoodsUnit, new org.netbeans.lib.awtextra.AbsoluteConstraints(192, 105, -1, -1));
+
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Deliver-IT | Order Menu");
 
+        welcomeLabel.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         welcomeLabel.setText("Welcome ");
 
         orderTable.setModel(new javax.swing.table.DefaultTableModel(
@@ -320,6 +293,7 @@ public class OrderMenu extends javax.swing.JFrame {
                 return types [columnIndex];
             }
         });
+        orderTable.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_NEXT_COLUMN);
         orderTable.setDropMode(javax.swing.DropMode.INSERT_ROWS);
         jScrollPane1.setViewportView(orderTable);
         if (orderTable.getColumnModel().getColumnCount() > 0) {
@@ -355,7 +329,14 @@ public class OrderMenu extends javax.swing.JFrame {
         });
 
         jLabel3.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
-        jLabel3.setText("Order Table");
+        jLabel3.setText("Order List Table");
+
+        btnLogOut.setText("Log Out");
+        btnLogOut.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                btnLogOutMouseClicked(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -366,27 +347,30 @@ public class OrderMenu extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(welcomeLabel)
                     .addComponent(btnCancelOrder, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(btnMkOrder, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(btnMkOrder, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(btnLogOut, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 71, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(btnRefresh, javax.swing.GroupLayout.PREFERRED_SIZE, 89, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 686, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addComponent(emailLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addGap(18, 18, 18)
+                    .addComponent(btnRefresh, javax.swing.GroupLayout.PREFERRED_SIZE, 89, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 686, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(emailLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 423, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(jLabel3)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(11, 11, 11)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(welcomeLabel)
-                        .addComponent(jLabel3))
-                    .addComponent(emailLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 15, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(11, 11, 11)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(welcomeLabel)
+                            .addComponent(emailLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 15, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addGroup(layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(jLabel3)))
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 172, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -395,7 +379,9 @@ public class OrderMenu extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(btnCancelOrder)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(btnRefresh)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnRefresh)
+                    .addComponent(btnLogOut))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -428,7 +414,7 @@ public class OrderMenu extends javax.swing.JFrame {
     private void btnRefreshMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnRefreshMouseClicked
         try {
             // TODO add your handling code here:
-            dao.setTableData(userSession,orderTable);
+            dao.setTableData(userSession, orderTable);
         } catch (SQLException ex) {
             Logger.getLogger(OrderMenu.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -493,6 +479,12 @@ public class OrderMenu extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_btnCancelOrderMouseClicked
 
+    private void btnLogOutMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnLogOutMouseClicked
+        // TODO add your handling code here:
+        new LoginForm().setVisible(true);
+        setVisible(false);
+    }//GEN-LAST:event_btnLogOutMouseClicked
+
     /**
      * @param args the command line arguments
      */
@@ -539,9 +531,11 @@ public class OrderMenu extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnCancelOrder;
     private javax.swing.JButton btnClear;
+    private javax.swing.JButton btnLogOut;
     private javax.swing.JButton btnMkOrder;
     private javax.swing.JButton btnRefresh;
     private javax.swing.JButton btnSubmit;
+    private javax.swing.JComboBox cmbBoxGoodsUnit;
     private javax.swing.JComboBox combDelivType;
     private javax.swing.JLabel delivTypeLabel;
     private javax.swing.JLabel emailLabel;
