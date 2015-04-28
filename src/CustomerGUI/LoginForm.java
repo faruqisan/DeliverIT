@@ -3,8 +3,8 @@ package CustomerGUI;
 import KonekDB.KoneksiMySQL;
 import KonekDB.ConnectionMessage;
 import com.sun.glass.events.KeyEvent;
-import java.awt.Color;
-import java.awt.Image;
+//import java.awt.Color;
+//import java.awt.Image;
 import java.awt.geom.RoundRectangle2D;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -13,8 +13,8 @@ import java.sql.Statement;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.ImageIcon;
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
+//import javax.swing.JFrame;
+//import javax.swing.JOptionPane;
 
 public class LoginForm extends javax.swing.JFrame {
 
