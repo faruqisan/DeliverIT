@@ -1,10 +1,9 @@
 package CustomerGUI;
 
+import Classess.OrderChecker;
 import KonekDB.KoneksiMySQL;
 import KonekDB.ConnectionMessage;
 import com.sun.glass.events.KeyEvent;
-//import java.awt.Color;
-//import java.awt.Image;
 import java.awt.geom.RoundRectangle2D;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -13,8 +12,7 @@ import java.sql.Statement;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.ImageIcon;
-//import javax.swing.JFrame;
-//import javax.swing.JOptionPane;
+import OrderCheckerGUI.OrderCheckerFrame;
 
 public class LoginForm extends javax.swing.JFrame {
 
@@ -189,7 +187,7 @@ public class LoginForm extends javax.swing.JFrame {
             KoneksiMySQL k = new KoneksiMySQL();
             Connection c = k.getConnection();
             Statement st = c.createStatement();
-            String sql = "select username,password from customer_data";
+            String sql = "select username,password,usertype from customer_data";
 
             String username = txtUserName.getText();
             String password = txtPassword.getText();
@@ -198,19 +196,22 @@ public class LoginForm extends javax.swing.JFrame {
             ResultSet rs = st.executeQuery(sql);
 
             while (rs.next()) {
-                if (username.equalsIgnoreCase(rs.getString("username")) && password.equalsIgnoreCase(rs.getString("password"))) {
-                    isLogin = true;
-                    setVisible(false);
-
-                    OrderMenu t = new OrderMenu(username);
-                    t.userSession = username;
-                    t.setVisible(true);
-
+                if (username.equalsIgnoreCase(rs.getString("username")) && password.equalsIgnoreCase(rs.getString("password"))) {                   
+                    isLogin = true; setVisible(false);
+                    if (rs.getString("usertype").equalsIgnoreCase("orderchecker")) {
+                        OrderCheckerFrame ordC = new OrderCheckerFrame(username);
+                        ordC.userSession = username;
+                        ordC.setVisible(true);
+                    } else {
+                        OrderMenu t = new OrderMenu(username);
+                        t.userSession = username;
+                        t.setVisible(true);
+                    }
                 }
             }
             if (isLogin == false) {
                 //JOptionPane.showMessageDialog(rootPane, "Username or Password is incorrect", "Login Fail", JOptionPane.ERROR_MESSAGE);
-                ConnectionMessage msg=new ConnectionMessage();
+                ConnectionMessage msg = new ConnectionMessage();
                 msg.lblMsg.setText("Username or Password Incorrect");
                 msg.setVisible(true);
                 txtPassword.setText("");

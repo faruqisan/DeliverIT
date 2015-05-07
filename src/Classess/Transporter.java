@@ -1,5 +1,5 @@
 package Classess;
-public class Transporter extends Pegawai implements Operation {
+public class Transporter extends Pegawai{
 
    private boolean goodsDeliveryStatus;
    
@@ -15,26 +15,5 @@ public class Transporter extends Pegawai implements Operation {
    public void setDelStatus(boolean status) {
 	   this.goodsDeliveryStatus=status;
    }
-
-
-@Override
-public void login() {
-	// TODO Auto-generated method stub
-	
-}
-
-
-@Override
-public void logout() {
-	// TODO Auto-generated method stub
-	
-}
-
-
-@Override
-public void changePassword() {
-	// TODO Auto-generated method stub
-	
-}
 
 }

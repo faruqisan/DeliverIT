@@ -4,14 +4,12 @@ import Classess.*;
 import KonekDB.KoneksiMySQL;
 import java.awt.geom.RoundRectangle2D;
 import java.sql.Connection;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.time.LocalDate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
-import net.proteanit.sql.DbUtils;
 
 /**
  *
@@ -66,12 +64,7 @@ public class OrderMenu extends javax.swing.JFrame {
             Logger.getLogger(OrderMenu.class.getName()).log(Level.SEVERE, null, ex);
         }
 
-        try {
-            dao.setTableData(newUserSession, orderTable);
-            //setTableData(newUserSession);
-        } catch (SQLException ex) {
-            Logger.getLogger(OrderMenu.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        dao.setTableData(newUserSession, orderTable);
 
     }
 
@@ -139,22 +132,23 @@ public class OrderMenu extends javax.swing.JFrame {
     private void initComponents() {
 
         orderForm = new javax.swing.JFrame();
+        jPanel1 = new javax.swing.JPanel();
         orderTitleLabel = new javax.swing.JLabel();
-        delivTypeLabel = new javax.swing.JLabel();
         combDelivType = new javax.swing.JComboBox();
-        labelPckAdd = new javax.swing.JLabel();
-        jLabel1 = new javax.swing.JLabel();
+        delivTypeLabel = new javax.swing.JLabel();
+        lblGoodsType = new javax.swing.JLabel();
         goodsTypeComb = new javax.swing.JComboBox();
         labelGoodsAmount = new javax.swing.JLabel();
         textGoodsAmount = new javax.swing.JTextField();
+        cmbBoxGoodsUnit = new javax.swing.JComboBox();
         txtPickupAddress = new javax.swing.JTextField();
-        jLabel2 = new javax.swing.JLabel();
+        labelPckAdd = new javax.swing.JLabel();
+        lblDestAdd = new javax.swing.JLabel();
         txtDestAdd = new javax.swing.JTextField();
         btnSubmit = new javax.swing.JButton();
         btnClear = new javax.swing.JButton();
         jButton1 = new javax.swing.JButton();
         labelInformationStatus = new javax.swing.JLabel();
-        cmbBoxGoodsUnit = new javax.swing.JComboBox();
         mainPanel = new javax.swing.JPanel();
         welcomeLabel = new javax.swing.JLabel();
         emailLabel = new javax.swing.JLabel();
@@ -168,15 +162,14 @@ public class OrderMenu extends javax.swing.JFrame {
 
         orderForm.setTitle("Deliver IT | Order Form");
         orderForm.setBounds(new java.awt.Rectangle(0, 0, 0, 0));
+        orderForm.setResizable(false);
+        orderForm.setSize(313, 450);
         orderForm.setLocationByPlatform(true);
-        orderForm.setMinimumSize(new java.awt.Dimension(270, 350));
-        orderForm.getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
+        jPanel1.setBackground(new java.awt.Color(255, 255, 255));
+
+        orderTitleLabel.setFont(new java.awt.Font("Calibri", 0, 18)); // NOI18N
         orderTitleLabel.setText("Order Form DeliverIT");
-        orderForm.getContentPane().add(orderTitleLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(67, 11, -1, -1));
-
-        delivTypeLabel.setText("Deliver Type");
-        orderForm.getContentPane().add(delivTypeLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 46, -1, -1));
 
         combDelivType.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Select", "NORMAL", "FAST" }));
         combDelivType.setToolTipText("");
@@ -189,13 +182,12 @@ public class OrderMenu extends javax.swing.JFrame {
                 combDelivTypeMouseExited(evt);
             }
         });
-        orderForm.getContentPane().add(combDelivType, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 43, 101, -1));
 
-        labelPckAdd.setText("Pickup Address");
-        orderForm.getContentPane().add(labelPckAdd, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 136, -1, -1));
+        delivTypeLabel.setFont(new java.awt.Font("Calibri", 0, 14)); // NOI18N
+        delivTypeLabel.setText("Deliver Type");
 
-        jLabel1.setText("Goods Type");
-        orderForm.getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 74, -1, -1));
+        lblGoodsType.setFont(new java.awt.Font("Calibri", 0, 14)); // NOI18N
+        lblGoodsType.setText("Goods Type");
 
         goodsTypeComb.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Select", "Electronic", "Furniture", "Food", "Raw" }));
         goodsTypeComb.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -206,10 +198,9 @@ public class OrderMenu extends javax.swing.JFrame {
                 goodsTypeCombMouseExited(evt);
             }
         });
-        orderForm.getContentPane().add(goodsTypeComb, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 74, 101, -1));
 
+        labelGoodsAmount.setFont(new java.awt.Font("Calibri", 0, 14)); // NOI18N
         labelGoodsAmount.setText("Goods Amount");
-        orderForm.getContentPane().add(labelGoodsAmount, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 105, -1, -1));
 
         textGoodsAmount.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseEntered(java.awt.event.MouseEvent evt) {
@@ -219,7 +210,8 @@ public class OrderMenu extends javax.swing.JFrame {
                 textGoodsAmountMouseExited(evt);
             }
         });
-        orderForm.getContentPane().add(textGoodsAmount, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 105, 42, -1));
+
+        cmbBoxGoodsUnit.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Box", "Unit", "Ton" }));
 
         txtPickupAddress.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseEntered(java.awt.event.MouseEvent evt) {
@@ -229,10 +221,12 @@ public class OrderMenu extends javax.swing.JFrame {
                 txtPickupAddressMouseExited(evt);
             }
         });
-        orderForm.getContentPane().add(txtPickupAddress, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 136, 101, -1));
 
-        jLabel2.setText("Destination Address");
-        orderForm.getContentPane().add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 167, -1, -1));
+        labelPckAdd.setFont(new java.awt.Font("Calibri", 0, 14)); // NOI18N
+        labelPckAdd.setText("Pickup Address");
+
+        lblDestAdd.setFont(new java.awt.Font("Calibri", 0, 14)); // NOI18N
+        lblDestAdd.setText("Destination Address");
 
         txtDestAdd.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseEntered(java.awt.event.MouseEvent evt) {
@@ -242,7 +236,6 @@ public class OrderMenu extends javax.swing.JFrame {
                 txtDestAddMouseExited(evt);
             }
         });
-        orderForm.getContentPane().add(txtDestAdd, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 167, 101, -1));
 
         btnSubmit.setText("Submit");
         btnSubmit.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -250,7 +243,6 @@ public class OrderMenu extends javax.swing.JFrame {
                 btnSubmitMouseClicked(evt);
             }
         });
-        orderForm.getContentPane().add(btnSubmit, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 236, -1, -1));
 
         btnClear.setText("Clear");
         btnClear.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -258,7 +250,6 @@ public class OrderMenu extends javax.swing.JFrame {
                 btnClearMouseClicked(evt);
             }
         });
-        orderForm.getContentPane().add(btnClear, new org.netbeans.lib.awtextra.AbsoluteConstraints(93, 236, 65, -1));
 
         jButton1.setText("Cancel");
         jButton1.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -266,13 +257,93 @@ public class OrderMenu extends javax.swing.JFrame {
                 jButton1MouseClicked(evt);
             }
         });
-        orderForm.getContentPane().add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(176, 236, -1, -1));
 
         labelInformationStatus.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
-        orderForm.getContentPane().add(labelInformationStatus, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 200, 220, 20));
 
-        cmbBoxGoodsUnit.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Box", "Unit", "Ton" }));
-        orderForm.getContentPane().add(cmbBoxGoodsUnit, new org.netbeans.lib.awtextra.AbsoluteConstraints(192, 105, -1, -1));
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(btnClear, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(btnSubmit, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel1Layout.createSequentialGroup()
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(lblDestAdd)
+                            .addComponent(labelPckAdd))
+                        .addGap(18, 18, 18)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(txtPickupAddress)
+                            .addComponent(txtDestAdd)))
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel1Layout.createSequentialGroup()
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(labelGoodsAmount)
+                            .addComponent(lblGoodsType)
+                            .addComponent(delivTypeLabel))
+                        .addGap(47, 47, 47)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addComponent(textGoodsAmount)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(cmbBoxGoodsUnit, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(goodsTypeComb, 0, 163, Short.MAX_VALUE)
+                            .addComponent(combDelivType, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel1Layout.createSequentialGroup()
+                        .addComponent(orderTitleLabel)
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addComponent(labelInformationStatus, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(orderTitleLabel)
+                .addGap(18, 18, 18)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(delivTypeLabel)
+                    .addComponent(combDelivType, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblGoodsType)
+                    .addComponent(goodsTypeComb, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(labelGoodsAmount)
+                    .addComponent(textGoodsAmount, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(cmbBoxGoodsUnit, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(txtPickupAddress, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(labelPckAdd))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblDestAdd)
+                    .addComponent(txtDestAdd, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(btnSubmit, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btnClear, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(labelInformationStatus, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(28, Short.MAX_VALUE))
+        );
+
+        javax.swing.GroupLayout orderFormLayout = new javax.swing.GroupLayout(orderForm.getContentPane());
+        orderForm.getContentPane().setLayout(orderFormLayout);
+        orderFormLayout.setHorizontalGroup(
+            orderFormLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+        );
+        orderFormLayout.setVerticalGroup(
+            orderFormLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+        );
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Deliver-IT | Order Menu");
@@ -371,7 +442,7 @@ public class OrderMenu extends javax.swing.JFrame {
                     .addComponent(emailLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 423, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 700, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 176, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(12, Short.MAX_VALUE))
         );
         mainPanelLayout.setVerticalGroup(
             mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -390,13 +461,22 @@ public class OrderMenu extends javax.swing.JFrame {
                         .addComponent(btnCancelOrder, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnRefresh, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 119, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 140, Short.MAX_VALUE)
                         .addComponent(btnLogOut, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
                 .addContainerGap())
         );
 
-        getContentPane().add(mainPanel, java.awt.BorderLayout.CENTER);
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+        getContentPane().setLayout(layout);
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(mainPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+        );
+        layout.setVerticalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(mainPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+        );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -425,12 +505,7 @@ public class OrderMenu extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton1MouseClicked
 
     private void btnRefreshMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnRefreshMouseClicked
-        try {
-            // TODO add your handling code here:
-            dao.setTableData(userSession, orderTable);
-        } catch (SQLException ex) {
-            Logger.getLogger(OrderMenu.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        dao.setTableData(userSession, orderTable);
     }//GEN-LAST:event_btnRefreshMouseClicked
 
     private void combDelivTypeMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_combDelivTypeMouseEntered
@@ -554,13 +629,14 @@ public class OrderMenu extends javax.swing.JFrame {
     private javax.swing.JLabel emailLabel;
     private javax.swing.JComboBox goodsTypeComb;
     private javax.swing.JButton jButton1;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
+    private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel labelGoodsAmount;
     private javax.swing.JLabel labelInformationStatus;
     private javax.swing.JLabel labelPckAdd;
+    private javax.swing.JLabel lblDestAdd;
+    private javax.swing.JLabel lblGoodsType;
     private javax.swing.JPanel mainPanel;
     private javax.swing.JFrame orderForm;
     private javax.swing.JTable orderTable;

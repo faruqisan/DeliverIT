@@ -1,5 +1,5 @@
 package Classess;
-public class Cashier extends Pegawai implements Operation {
+public class Cashier extends Pegawai{
 
    public void setBillPaymentStatus(Bill b,boolean payStat) {
 	   b.paymentStatus=payStat;
@@ -14,26 +14,4 @@ public class Cashier extends Pegawai implements Operation {
    public void printBill(Bill b) {
 	   System.out.println();
    }
-
-
-@Override
-public void login() {
-	// TODO Auto-generated method stub
-	
-}
-
-
-@Override
-public void logout() {
-	// TODO Auto-generated method stub
-	
-}
-
-
-@Override
-public void changePassword() {
-	// TODO Auto-generated method stub
-	
-}
-
 }

@@ -1,5 +1,5 @@
 package Classess;
-public class GoodsTracker extends Pegawai implements Operation {
+public class GoodsTracker extends Pegawai{
 
    private boolean trackingStatus;
    
@@ -10,23 +10,5 @@ public class GoodsTracker extends Pegawai implements Operation {
    public void setTrackingStatus() {
       // TODO: implement
    }
-
-@Override
-public void login() {
-	// TODO Auto-generated method stub
-	
-}
-
-@Override
-public void logout() {
-	// TODO Auto-generated method stub
-	
-}
-
-@Override
-public void changePassword() {
-	// TODO Auto-generated method stub
-	
-}
 
 }
