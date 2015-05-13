@@ -22,19 +22,19 @@ public class CustomerDAO {
         try {
             Connection c = new KoneksiMySQL().getConnection();
             Statement st = c.createStatement();
-            String sql = "SELECT `order_id`, `order_date`, `oder_type`, `order_pickup_address`, `oder_destination_address`, `order_goods_type`, `order_goods_amount`, `order_status` FROM `deliverit_main`.`order_data` WHERE `userOrdered` LIKE '" + newUserSession + "'";
+            String sql = "SELECT `order_id`, `order_date`, `oder_type`, `order_pickup_address`, `oder_destination_address`, `order_goods_type`, `order_goods_amount`, `unit`,`order_status` FROM `deliverit_main`.`order_data` WHERE `userOrdered` LIKE '" + newUserSession + "'";
             ResultSet rs = st.executeQuery(sql);
-            String columnHeader[]={"Order ID","Order Date","Order Type","Pickup Address","Destination Address","Goods Type","Goods Amount","Order Status"};
+            String columnHeader[]={"Order ID","Order Date","Order Type","Pickup Address","Destination Address","Goods Type","Goods Amount","Unit","Order Status"};
             orderTable.setModel(DbUtils.resultSetToTableModel(rs));
             
             for (int i = 0; i < orderTable.getColumnModel().getColumnCount(); i++) {
                 orderTable.getColumnModel().getColumn(i).setHeaderValue(columnHeader[i]);
             }
             for(int i=0;i<orderTable.getRowCount();i++){
-                if(orderTable.getValueAt(i,7).toString().equalsIgnoreCase("false")){
-                    orderTable.setValueAt("Pending", i, 7);
+                if(orderTable.getValueAt(i,8).toString().equalsIgnoreCase("false")){
+                    orderTable.setValueAt("Pending", i, 8);
                 }else{
-                    orderTable.setValueAt("Confirmed", i, 7);
+                    orderTable.setValueAt("Confirmed", i, 8);
                 }
             }
             
@@ -53,10 +53,10 @@ public class CustomerDAO {
             KoneksiMySQL k = new KoneksiMySQL();
             Connection c = k.getConnection();
             Statement st = c.createStatement();
-            String sql = "SELECT * FROM `customer_data` WHERE `username` LIKE '" + newUserSession + "' ORDER BY `customer_id` ASC";
+            String sql = "SELECT * FROM `user_data` WHERE `username` LIKE '" + newUserSession+"'";
             ResultSet rs = st.executeQuery(sql);
             while (rs.next()) {
-                cust.setName(rs.getString("nama"));
+                cust.setName(rs.getString("name"));
                 cust.seteMail(rs.getString("email"));
                 cust.setAddress(rs.getString("address"));
                 cust.setPhoneNumber(rs.getString("phoneNumber"));

@@ -1,7 +1,9 @@
 package CustomerGUI;
 
+import Login.LoginForm;
 import Classess.*;
 import KonekDB.KoneksiMySQL;
+import java.awt.Font;
 import java.awt.geom.RoundRectangle2D;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -17,8 +19,10 @@ import javax.swing.JOptionPane;
  */
 public class OrderMenu extends javax.swing.JFrame {
 
-    public static String userSession ;
+    public static String userSession;
     CustomerDAO dao = new CustomerDAO();
+    int mouseX;
+    int mouseY;
 
     public OrderMenu(String newCustomer) throws SQLException {
         Customer customer = dao.setCustomerData(newCustomer);
@@ -26,11 +30,38 @@ public class OrderMenu extends javax.swing.JFrame {
         setLocationRelativeTo(null);
         setShape(new RoundRectangle2D.Double(0, 0, this.getWidth(), this.getHeight(), 25, 25));
         welcomeLabel.setText(welcomeLabel.getText() + customer.getName());
-        emailLabel.setText(customer.geteMail());
         dao.setTableData(newCustomer, orderTable);
         orderTable.setShowHorizontalLines(false);
-    }     
-     
+        notification();
+    }
+    
+    public void notification(){
+        int confirmedOrder=0;
+        for(int i=0;i<orderTable.getRowCount();i++){
+            if(orderTable.getValueAt(i,8).toString().equalsIgnoreCase("Confirmed")){
+                confirmedOrder++;
+            }
+        }
+        if(confirmedOrder!=0){
+            notificationLabel.setText(confirmedOrder+" Order Confirmed !");
+        }else{
+            notificationLabel.setText("");
+        }
+    }
+    
+    private void payOrder(String newUserSession) {
+
+        try {
+            if (orderTable.getValueAt(orderTable.getSelectedRow(), 8).toString().equalsIgnoreCase("Pending")) {
+                JOptionPane.showMessageDialog(null, "Order Still Pending");
+            } else {
+              new PaymentMenu(orderTable.getValueAt(orderTable.getSelectedRow(), 0).toString()).setVisible(true);
+            }
+        } catch (ArrayIndexOutOfBoundsException e) {
+            JOptionPane.showMessageDialog(rootPane, "Order Not Selected");
+        }
+    }
+
     private void submitOrderData(String newUserSession) {
         try {
             int goodsamount = Integer.parseInt(textGoodsAmount.getText());
@@ -43,7 +74,8 @@ public class OrderMenu extends javax.swing.JFrame {
             orderForm.goodsAmount = goodsamount;
             orderForm.goodsType = goodsTypeComb.getSelectedItem().toString().toUpperCase();
             orderForm.pickupAddress = txtPickupAddress.getText().toUpperCase();
-            orderForm.deliverAddress = txtDestAdd.getText().toString();
+            orderForm.deliverAddress = txtDestAdd.getText();
+            orderForm.goodsUnit = cmbBoxGoodsUnit.getSelectedItem().toString().toUpperCase();
 
             KoneksiMySQL k = new KoneksiMySQL();
             Connection c = k.getConnection();
@@ -51,10 +83,10 @@ public class OrderMenu extends javax.swing.JFrame {
 
             String sql = "INSERT INTO `order_data`(`order_id`,`userOrdered`, `order_date`,"
                     + " `oder_type`, `order_pickup_address`, `oder_destination_address`,"
-                    + " `order_goods_type`, `order_goods_amount`, `order_status`) VALUES "
+                    + " `order_goods_type`, `order_goods_amount`, `order_status`, `unit`) VALUES "
                     + "(NULL,'" + newUserSession + "','" + orderForm.getDate() + "','" + orderForm.deliverType
                     + "','" + orderForm.pickupAddress + "','" + orderForm.deliverAddress + "','" + orderForm.goodsType
-                    + "','" + orderForm.goodsAmount + "','0')";
+                    + "','" + orderForm.goodsAmount + "','0','" + orderForm.goodsUnit + "')";
 
             st.execute(sql);
             JOptionPane.showMessageDialog(rootPane, "Order Submit Succesfull");
@@ -65,13 +97,13 @@ public class OrderMenu extends javax.swing.JFrame {
         }
 
         dao.setTableData(newUserSession, orderTable);
+        notification();
 
     }
 
     private void cancelOrder(String newUserSession) throws SQLException {
-        if (orderTable.getSelectedRow()== -1) {
-            JOptionPane.showMessageDialog(rootPane, "Data not selected");
-        } else {
+
+        try {
             String orderID = orderTable.getValueAt(orderTable.getSelectedRow(), 0).toString();
             int pilihanUser = JOptionPane.showConfirmDialog(rootPane, "Delete This Order ? " + "\nOrderID = " + orderID);
 
@@ -84,7 +116,10 @@ public class OrderMenu extends javax.swing.JFrame {
                 JOptionPane.showMessageDialog(rootPane, "Data Deleted Succesfully");
                 dao.setTableData(newUserSession, orderTable);
             }
+        } catch (ArrayIndexOutOfBoundsException e) {
+            JOptionPane.showMessageDialog(rootPane, "Data not selected");
         }
+        notification();
 
     }
 
@@ -151,7 +186,6 @@ public class OrderMenu extends javax.swing.JFrame {
         labelInformationStatus = new javax.swing.JLabel();
         mainPanel = new javax.swing.JPanel();
         welcomeLabel = new javax.swing.JLabel();
-        emailLabel = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         orderTable = new javax.swing.JTable();
         btnMkOrder = new javax.swing.JButton();
@@ -159,6 +193,8 @@ public class OrderMenu extends javax.swing.JFrame {
         btnCancelOrder = new javax.swing.JButton();
         jLabel3 = new javax.swing.JLabel();
         btnLogOut = new javax.swing.JButton();
+        btnPayment = new javax.swing.JButton();
+        notificationLabel = new javax.swing.JLabel();
 
         orderForm.setTitle("Deliver IT | Order Form");
         orderForm.setBounds(new java.awt.Rectangle(0, 0, 0, 0));
@@ -350,8 +386,18 @@ public class OrderMenu extends javax.swing.JFrame {
         setUndecorated(true);
 
         mainPanel.setBackground(new java.awt.Color(255, 255, 255));
+        mainPanel.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
+            public void mouseDragged(java.awt.event.MouseEvent evt) {
+                mainPanelMouseDragged(evt);
+            }
+        });
+        mainPanel.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                mainPanelMousePressed(evt);
+            }
+        });
 
-        welcomeLabel.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        welcomeLabel.setFont(new java.awt.Font("Marketing Script", 0, 24)); // NOI18N
         welcomeLabel.setText("Welcome ");
 
         orderTable.setModel(new javax.swing.table.DefaultTableModel(
@@ -359,11 +405,11 @@ public class OrderMenu extends javax.swing.JFrame {
 
             },
             new String [] {
-                "Order ID", "Order Date", "Order Type", "Pickup Address", "Destination Address", "Goods Type", "Goods Amount", "Goods Status"
+                "Order ID", "Order Date", "Order Type", "Pickup Address", "Destination Address", "Goods Type", "Goods Amount", "Goods Unit", "Goods Status"
             }
         ) {
             Class[] types = new Class [] {
-                java.lang.Integer.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class
+                java.lang.Integer.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class
             };
 
             public Class getColumnClass(int columnIndex) {
@@ -383,10 +429,12 @@ public class OrderMenu extends javax.swing.JFrame {
             orderTable.getColumnModel().getColumn(5).setResizable(false);
             orderTable.getColumnModel().getColumn(6).setResizable(false);
             orderTable.getColumnModel().getColumn(7).setResizable(false);
+            orderTable.getColumnModel().getColumn(8).setResizable(false);
         }
 
         btnMkOrder.setBackground(new java.awt.Color(153, 153, 255));
         btnMkOrder.setFont(new java.awt.Font("Calibri", 0, 18)); // NOI18N
+        btnMkOrder.setForeground(new java.awt.Color(255, 255, 255));
         btnMkOrder.setText("Make Order");
         btnMkOrder.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -396,6 +444,7 @@ public class OrderMenu extends javax.swing.JFrame {
 
         btnRefresh.setBackground(new java.awt.Color(153, 153, 255));
         btnRefresh.setFont(new java.awt.Font("Calibri", 0, 18)); // NOI18N
+        btnRefresh.setForeground(new java.awt.Color(255, 255, 255));
         btnRefresh.setText("Refresh");
         btnRefresh.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -405,6 +454,7 @@ public class OrderMenu extends javax.swing.JFrame {
 
         btnCancelOrder.setBackground(new java.awt.Color(153, 153, 255));
         btnCancelOrder.setFont(new java.awt.Font("Calibri", 0, 18)); // NOI18N
+        btnCancelOrder.setForeground(new java.awt.Color(255, 255, 255));
         btnCancelOrder.setText("Cancel Order");
         btnCancelOrder.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -413,15 +463,38 @@ public class OrderMenu extends javax.swing.JFrame {
         });
 
         jLabel3.setFont(new java.awt.Font("Calibri", 0, 18)); // NOI18N
-        jLabel3.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        jLabel3.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         jLabel3.setText("Order List Table");
 
         btnLogOut.setBackground(new java.awt.Color(255, 102, 102));
         btnLogOut.setFont(new java.awt.Font("Calibri", 0, 18)); // NOI18N
+        btnLogOut.setForeground(new java.awt.Color(255, 255, 255));
         btnLogOut.setText("Log Out");
         btnLogOut.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 btnLogOutMouseClicked(evt);
+            }
+        });
+
+        btnPayment.setBackground(new java.awt.Color(153, 153, 255));
+        btnPayment.setFont(new java.awt.Font("Calibri", 0, 18)); // NOI18N
+        btnPayment.setForeground(new java.awt.Color(255, 255, 255));
+        btnPayment.setText("Pay");
+        btnPayment.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                btnPaymentMouseClicked(evt);
+            }
+        });
+
+        notificationLabel.setFont(new java.awt.Font("Calibri", 0, 18)); // NOI18N
+        notificationLabel.setForeground(new java.awt.Color(255, 51, 51));
+        notificationLabel.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        notificationLabel.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                notificationLabelMouseEntered(evt);
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                notificationLabelMouseExited(evt);
             }
         });
 
@@ -431,27 +504,33 @@ public class OrderMenu extends javax.swing.JFrame {
             mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(mainPanelLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(welcomeLabel)
-                    .addComponent(btnMkOrder, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(btnCancelOrder, javax.swing.GroupLayout.DEFAULT_SIZE, 200, Short.MAX_VALUE)
-                    .addComponent(btnRefresh, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(btnLogOut, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addGap(18, 18, 18)
                 .addGroup(mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(emailLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 423, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 700, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 176, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(12, Short.MAX_VALUE))
+                    .addGroup(mainPanelLayout.createSequentialGroup()
+                        .addComponent(welcomeLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 394, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(334, 334, 334)
+                        .addComponent(notificationLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGap(14, 14, 14))
+                    .addGroup(mainPanelLayout.createSequentialGroup()
+                        .addGroup(mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(btnMkOrder, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(btnCancelOrder, javax.swing.GroupLayout.DEFAULT_SIZE, 200, Short.MAX_VALUE)
+                            .addComponent(btnRefresh, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(btnLogOut, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(btnPayment, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGap(18, 18, 18)
+                        .addGroup(mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel3, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 176, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 700, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         mainPanelLayout.setVerticalGroup(
             mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(mainPanelLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(welcomeLabel)
-                    .addComponent(emailLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 15, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(63, 63, 63)
+                .addGroup(mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(welcomeLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(notificationLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGap(11, 11, 11)
                 .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -460,8 +539,10 @@ public class OrderMenu extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnCancelOrder, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnPayment, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnRefresh, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 140, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 94, Short.MAX_VALUE)
                         .addComponent(btnLogOut, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
                 .addContainerGap())
@@ -506,6 +587,7 @@ public class OrderMenu extends javax.swing.JFrame {
 
     private void btnRefreshMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnRefreshMouseClicked
         dao.setTableData(userSession, orderTable);
+        notification();
     }//GEN-LAST:event_btnRefreshMouseClicked
 
     private void combDelivTypeMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_combDelivTypeMouseEntered
@@ -573,6 +655,33 @@ public class OrderMenu extends javax.swing.JFrame {
         setVisible(false);
     }//GEN-LAST:event_btnLogOutMouseClicked
 
+    private void btnPaymentMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnPaymentMouseClicked
+        // TODO add your handling code here:
+        payOrder(userSession);
+    }//GEN-LAST:event_btnPaymentMouseClicked
+
+    private void mainPanelMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_mainPanelMousePressed
+        // TODO add your handling code here:
+        mouseX=evt.getX();
+        mouseY=evt.getY();
+    }//GEN-LAST:event_mainPanelMousePressed
+
+    private void mainPanelMouseDragged(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_mainPanelMouseDragged
+        // TODO add your handling code here:
+        int x=evt.getXOnScreen();
+        int y=evt.getYOnScreen();
+        this.setLocation(x-mouseX, y-mouseY);
+    }//GEN-LAST:event_mainPanelMouseDragged
+
+    private void notificationLabelMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_notificationLabelMouseEntered
+        notificationLabel.setFont(new java.awt.Font("Calibri", 0, 24));
+    }//GEN-LAST:event_notificationLabelMouseEntered
+
+    private void notificationLabelMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_notificationLabelMouseExited
+        // TODO add your handling code here:
+        notificationLabel.setFont(new java.awt.Font("Calibri", 0, 18));
+    }//GEN-LAST:event_notificationLabelMouseExited
+
     /**
      * @param args the command line arguments
      */
@@ -621,12 +730,12 @@ public class OrderMenu extends javax.swing.JFrame {
     private javax.swing.JButton btnClear;
     private javax.swing.JButton btnLogOut;
     private javax.swing.JButton btnMkOrder;
+    private javax.swing.JButton btnPayment;
     private javax.swing.JButton btnRefresh;
     private javax.swing.JButton btnSubmit;
     private javax.swing.JComboBox cmbBoxGoodsUnit;
     private javax.swing.JComboBox combDelivType;
     private javax.swing.JLabel delivTypeLabel;
-    private javax.swing.JLabel emailLabel;
     private javax.swing.JComboBox goodsTypeComb;
     private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel3;
@@ -638,6 +747,7 @@ public class OrderMenu extends javax.swing.JFrame {
     private javax.swing.JLabel lblDestAdd;
     private javax.swing.JLabel lblGoodsType;
     private javax.swing.JPanel mainPanel;
+    private javax.swing.JLabel notificationLabel;
     private javax.swing.JFrame orderForm;
     private javax.swing.JTable orderTable;
     private javax.swing.JLabel orderTitleLabel;

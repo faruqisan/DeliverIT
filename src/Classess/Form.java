@@ -4,7 +4,6 @@ public class Form {
    private String id;
    private String date;
    private String customerName;
-   private String companyName;
 
    public String getId() {
 	return id;
@@ -30,12 +29,5 @@ public class Form {
 	   return this.customerName;
    }
 
-   public void setCompName(String compName) {
-      this.companyName = compName;
-   }
-   
-   public String getCompName(){
-	   return this.companyName;
-   }
 
 }

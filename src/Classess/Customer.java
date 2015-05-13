@@ -13,7 +13,6 @@ public class Customer extends User{
     public void makeOrder(Scanner s) {
         OrderForm of = new OrderForm();
         of.setCusName(getName());
-        of.setCompName(companyName);
         System.out.print("Deliver Type : ");
         of.deliverType = s.nextLine();
         System.out.print("Pickup Address : ");
