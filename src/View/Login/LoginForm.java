@@ -3,6 +3,7 @@ package View.Login;
 import View.Customer.OrderMenu;
 import MySQL.Koneksi.KoneksiMySQL;
 import MySQL.Koneksi.ConnectionMessage;
+import View.Keuangan.MenuKeuangan;
 import com.sun.glass.events.KeyEvent;
 import java.awt.geom.RoundRectangle2D;
 import java.sql.Connection;
@@ -27,7 +28,7 @@ public class LoginForm extends javax.swing.JFrame {
         setShape(new RoundRectangle2D.Double(0, 0, this.getWidth(), this.getHeight(), 25, 25));
         ImageIcon img = new ImageIcon(getClass().getResource("/images/profle.png"));
         setIconImage(img.getImage());
-        
+
     }
 
     public String getUserLoggedin() {
@@ -110,6 +111,7 @@ public class LoginForm extends javax.swing.JFrame {
         btnLogin.setForeground(new java.awt.Color(255, 255, 255));
         btnLogin.setText("LOGIN");
         btnLogin.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
+        btnLogin.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         btnLogin.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 btnLoginMouseClicked(evt);
@@ -131,6 +133,7 @@ public class LoginForm extends javax.swing.JFrame {
         btnExit.setFont(new java.awt.Font("Calibri", 0, 18)); // NOI18N
         btnExit.setForeground(new java.awt.Color(255, 255, 255));
         btnExit.setText("EXIT");
+        btnExit.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         btnExit.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 btnExitMouseClicked(evt);
@@ -206,32 +209,54 @@ public class LoginForm extends javax.swing.JFrame {
             String username = txtUserName.getText();
             String password = txtPassword.getText();
             boolean isLogin = false;
-
+            String userType = "";
             ResultSet rs = st.executeQuery(sql);
 
             while (rs.next()) {
-                if (username.equalsIgnoreCase(rs.getString("username")) && password.equalsIgnoreCase(rs.getString("password"))) {                   
-                    isLogin = true; setVisible(false);
-                    if (rs.getString("usertype").equalsIgnoreCase("orderchecker")) {
-                        OrderCheckerFrame ordC = new OrderCheckerFrame(username);
-                        ordC.userSession = username;
-                        ordC.setVisible(true);
-                    } else {
-                        OrderMenu t = new OrderMenu(username);
-                        t.userSession = username;
-                        t.setVisible(true);
+                if (username.equalsIgnoreCase(rs.getString("username")) && password.equalsIgnoreCase(rs.getString("password"))) {
+                    isLogin = true;
+                    setVisible(false);
+
+                    userType = rs.getString("usertype").toLowerCase();
+                    switch (userType) {
+                        case "orderchecker":
+                            OrderCheckerFrame ordC = new OrderCheckerFrame(username);
+                            ordC.userSession = username;
+                            ordC.setVisible(true);
+                            break;
+                        case "customer":
+                            OrderMenu t = new OrderMenu(username);
+                            t.userSession = username;
+                            t.setVisible(true);
+                            break;
+                        case "cashier":
+                            MenuKeuangan cash=new MenuKeuangan(username);
+                            cash.userSession=username;
+                            cash.setVisible(true);
+                            break;
                     }
+                    /*
+                     if (rs.getString("usertype").equalsIgnoreCase("orderchecker")) {
+                     OrderCheckerFrame ordC = new OrderCheckerFrame(username);
+                     ordC.userSession = username;
+                     ordC.setVisible(true);
+                     } else {
+                     OrderMenu t = new OrderMenu(username);
+                     t.userSession = username;
+                     t.setVisible(true);
+                     } 
+                    
+                     */
+
                 }
             }
             if (isLogin == false) {
-                //JOptionPane.showMessageDialog(rootPane, "Username or Password is incorrect", "Login Fail", JOptionPane.ERROR_MESSAGE);
                 ConnectionMessage msg = new ConnectionMessage();
                 msg.lblMsg.setText("Username or Password Incorrect");
                 msg.setVisible(true);
                 txtPassword.setText("");
                 System.out.println("Login Fail");
             }
-
             c.close();
         } catch (SQLException ex) {
             Logger.getLogger(LoginForm.class.getName()).log(Level.SEVERE, null, ex);
@@ -306,21 +331,21 @@ public class LoginForm extends javax.swing.JFrame {
 
     private void btnExitMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnExitMouseExited
         // TODO add your handling code here:
-        btnExit.setBackground(new java.awt.Color(244,67,54));
+        btnExit.setBackground(new java.awt.Color(244, 67, 54));
         btnExit.setForeground(new java.awt.Color(255, 255, 255));
     }//GEN-LAST:event_btnExitMouseExited
 
     private void mainPanelMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_mainPanelMousePressed
         // TODO add your handling code here:
-        xMouse=evt.getX();
-        yMouse=evt.getY();
+        xMouse = evt.getX();
+        yMouse = evt.getY();
     }//GEN-LAST:event_mainPanelMousePressed
 
     private void mainPanelMouseDragged(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_mainPanelMouseDragged
         // TODO add your handling code here:
-        int x=evt.getXOnScreen();
-        int y=evt.getYOnScreen();
-        this.setLocation(x-xMouse, y-yMouse);
+        int x = evt.getXOnScreen();
+        int y = evt.getYOnScreen();
+        this.setLocation(x - xMouse, y - yMouse);
     }//GEN-LAST:event_mainPanelMouseDragged
 
     /**

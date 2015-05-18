@@ -22,7 +22,7 @@ import net.proteanit.sql.DbUtils;
 
 public class OrderCheckerFrame extends javax.swing.JFrame {
 
-    public static String userSession="ordercheck";
+    public static String userSession;
     OrderChecker orderChecker = new OrderChecker();
     Connection con = new KoneksiMySQL().getConnection();
     String tableUsed;
@@ -376,6 +376,7 @@ public class OrderCheckerFrame extends javax.swing.JFrame {
 
         confirmOrderButton.setFont(new java.awt.Font("Calibri", 0, 18)); // NOI18N
         confirmOrderButton.setText("Confirm Order");
+        confirmOrderButton.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         confirmOrderButton.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 confirmOrderButtonMouseClicked(evt);
@@ -384,6 +385,7 @@ public class OrderCheckerFrame extends javax.swing.JFrame {
 
         unconfirmOrderButton.setFont(new java.awt.Font("Calibri", 0, 18)); // NOI18N
         unconfirmOrderButton.setText("Unconfirm Order");
+        unconfirmOrderButton.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         unconfirmOrderButton.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 unconfirmOrderButtonMouseClicked(evt);
@@ -392,6 +394,7 @@ public class OrderCheckerFrame extends javax.swing.JFrame {
 
         refreshButton.setFont(new java.awt.Font("Calibri", 0, 18)); // NOI18N
         refreshButton.setText("Refresh");
+        refreshButton.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         refreshButton.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 refreshButtonMouseClicked(evt);

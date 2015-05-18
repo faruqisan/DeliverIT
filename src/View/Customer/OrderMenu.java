@@ -437,6 +437,7 @@ public class OrderMenu extends javax.swing.JFrame {
         btnMkOrder.setFont(new java.awt.Font("Calibri", 0, 18)); // NOI18N
         btnMkOrder.setForeground(new java.awt.Color(255, 255, 255));
         btnMkOrder.setText("Make Order");
+        btnMkOrder.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         btnMkOrder.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 btnMkOrderMouseClicked(evt);
@@ -447,6 +448,7 @@ public class OrderMenu extends javax.swing.JFrame {
         btnRefresh.setFont(new java.awt.Font("Calibri", 0, 18)); // NOI18N
         btnRefresh.setForeground(new java.awt.Color(255, 255, 255));
         btnRefresh.setText("Refresh");
+        btnRefresh.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         btnRefresh.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 btnRefreshMouseClicked(evt);
@@ -457,6 +459,7 @@ public class OrderMenu extends javax.swing.JFrame {
         btnCancelOrder.setFont(new java.awt.Font("Calibri", 0, 18)); // NOI18N
         btnCancelOrder.setForeground(new java.awt.Color(255, 255, 255));
         btnCancelOrder.setText("Cancel Order");
+        btnCancelOrder.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         btnCancelOrder.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 btnCancelOrderMouseClicked(evt);
@@ -471,6 +474,7 @@ public class OrderMenu extends javax.swing.JFrame {
         btnLogOut.setFont(new java.awt.Font("Calibri", 0, 18)); // NOI18N
         btnLogOut.setForeground(new java.awt.Color(255, 255, 255));
         btnLogOut.setText("Log Out");
+        btnLogOut.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         btnLogOut.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 btnLogOutMouseClicked(evt);
@@ -481,6 +485,7 @@ public class OrderMenu extends javax.swing.JFrame {
         btnPayment.setFont(new java.awt.Font("Calibri", 0, 18)); // NOI18N
         btnPayment.setForeground(new java.awt.Color(255, 255, 255));
         btnPayment.setText("Pay");
+        btnPayment.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         btnPayment.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 btnPaymentMouseClicked(evt);
