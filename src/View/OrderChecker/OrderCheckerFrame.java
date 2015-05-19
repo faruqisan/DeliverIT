@@ -11,6 +11,7 @@ import Model.OrderChecker;
 import View.Login.LoginForm;
 import MySQL.Koneksi.KoneksiMySQL;
 import java.awt.Color;
+import java.awt.event.KeyEvent;
 import java.sql.Statement;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -45,10 +46,39 @@ public class OrderCheckerFrame extends javax.swing.JFrame {
 
     }
 
+    private void Search(String keywords, String searchBy) {
+        if (keywords.equals("")) {
+            setTableDataUnconfirmed();
+        } else {
+            if (searchBy.equalsIgnoreCase("Order ID")) {
+                searchBy = "order_id";
+            }
+            try {
+                String sql = "SELECT * FROM ORDER_DATA WHERE `" + searchBy + "` LIKE '" + keywords + "'";
+                Statement st = con.createStatement();
+                ResultSet rs = st.executeQuery(sql);
+                orderTable.setModel(DbUtils.resultSetToTableModel(rs));
+                for (int i = 0; i < orderTable.getColumnModel().getColumnCount(); i++) {
+                    orderTable.getColumnModel().getColumn(i).setHeaderValue(columnHeader[i]);
+                }
+                for (int i = 0; i < orderTable.getRowCount(); i++) {
+                    if (orderTable.getValueAt(i, 9).toString().equalsIgnoreCase("false")) {
+                        orderTable.setValueAt("Pending", i, 9);
+                    } else {
+                        orderTable.setValueAt("Confirmed", i, 9);
+                    }
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+
+        }
+    }
+
     private void deleteBill(int rowSelected) {
         int orderId = (int) orderTable.getValueAt(rowSelected, 0);
         try {
-            String sql = "DELETE FROM `deliverit_main`.`transaction` WHERE `transaction`.`order_id` ="+orderId+";";
+            String sql = "DELETE FROM `deliverit_main`.`transaction` WHERE `transaction`.`order_id` =" + orderId + ";";
             Statement st = con.createStatement();
             st.execute(sql);
             st.close();
@@ -100,12 +130,12 @@ public class OrderCheckerFrame extends javax.swing.JFrame {
             default:
         }
 
-        int finalCost =0;
+        int finalCost = 0;
 
         if (orderTable.getValueAt(rowSelected, 3).toString().equalsIgnoreCase("fast")) {
-            finalCost=(costPerUnit*multiply)+200000;
+            finalCost = (costPerUnit * multiply) + 200000;
         } else {
-            finalCost=costPerUnit*multiply;
+            finalCost = costPerUnit * multiply;
         }
         return finalCost;
     }
@@ -257,6 +287,8 @@ public class OrderCheckerFrame extends javax.swing.JFrame {
         jScrollPane1 = new javax.swing.JScrollPane();
         orderTable = new javax.swing.JTable();
         tableStatus = new javax.swing.JLabel();
+        textSearch = new javax.swing.JTextField();
+        comboBoxSearchBy = new javax.swing.JComboBox();
         operationPanel = new javax.swing.JPanel();
         confirmOrderButton = new javax.swing.JButton();
         unconfirmOrderButton = new javax.swing.JButton();
@@ -349,6 +381,21 @@ public class OrderCheckerFrame extends javax.swing.JFrame {
 
         tableStatus.setText("   ");
 
+        textSearch.setText("Search");
+        textSearch.setCursor(new java.awt.Cursor(java.awt.Cursor.TEXT_CURSOR));
+        textSearch.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                textSearchMouseClicked(evt);
+            }
+        });
+        textSearch.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                textSearchKeyPressed(evt);
+            }
+        });
+
+        comboBoxSearchBy.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Order ID" }));
+
         javax.swing.GroupLayout tablePanelLayout = new javax.swing.GroupLayout(tablePanel);
         tablePanel.setLayout(tablePanelLayout);
         tablePanelLayout.setHorizontalGroup(
@@ -358,6 +405,10 @@ public class OrderCheckerFrame extends javax.swing.JFrame {
                 .addGroup(tablePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 683, Short.MAX_VALUE)
                     .addGroup(tablePanelLayout.createSequentialGroup()
+                        .addComponent(textSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 169, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(comboBoxSearchBy, javax.swing.GroupLayout.PREFERRED_SIZE, 135, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(tableStatus, javax.swing.GroupLayout.PREFERRED_SIZE, 171, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
@@ -366,15 +417,20 @@ public class OrderCheckerFrame extends javax.swing.JFrame {
             tablePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, tablePanelLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(tableStatus)
+                .addGroup(tablePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(tableStatus)
+                    .addComponent(textSearch, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(comboBoxSearchBy, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 298, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 292, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
         operationPanel.setBackground(new java.awt.Color(255, 255, 255));
 
+        confirmOrderButton.setBackground(new java.awt.Color(102, 102, 255));
         confirmOrderButton.setFont(new java.awt.Font("Calibri", 0, 18)); // NOI18N
+        confirmOrderButton.setForeground(new java.awt.Color(255, 255, 255));
         confirmOrderButton.setText("Confirm Order");
         confirmOrderButton.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         confirmOrderButton.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -383,7 +439,9 @@ public class OrderCheckerFrame extends javax.swing.JFrame {
             }
         });
 
+        unconfirmOrderButton.setBackground(new java.awt.Color(102, 102, 255));
         unconfirmOrderButton.setFont(new java.awt.Font("Calibri", 0, 18)); // NOI18N
+        unconfirmOrderButton.setForeground(new java.awt.Color(255, 255, 255));
         unconfirmOrderButton.setText("Unconfirm Order");
         unconfirmOrderButton.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         unconfirmOrderButton.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -392,7 +450,9 @@ public class OrderCheckerFrame extends javax.swing.JFrame {
             }
         });
 
+        refreshButton.setBackground(new java.awt.Color(102, 102, 255));
         refreshButton.setFont(new java.awt.Font("Calibri", 0, 18)); // NOI18N
+        refreshButton.setForeground(new java.awt.Color(255, 255, 255));
         refreshButton.setText("Refresh");
         refreshButton.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         refreshButton.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -578,13 +638,13 @@ public class OrderCheckerFrame extends javax.swing.JFrame {
 
     private void confirmOrderButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_confirmOrderButtonMouseClicked
         // TODO add your handling code here:
-            confirmOrder();
+        confirmOrder();
     }//GEN-LAST:event_confirmOrderButtonMouseClicked
 
     private void unconfirmOrderButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_unconfirmOrderButtonMouseClicked
         // TODO add your handling code here:
 
-            unconfirmOrder();
+        unconfirmOrder();
     }//GEN-LAST:event_unconfirmOrderButtonMouseClicked
 
     private void jMenuBar1MousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jMenuBar1MousePressed
@@ -646,6 +706,20 @@ public class OrderCheckerFrame extends javax.swing.JFrame {
         setTableDataUnconfirmed();
     }//GEN-LAST:event_unconfirmedOrderMenuItemActionPerformed
 
+    private void textSearchMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_textSearchMouseClicked
+        // TODO add your handling code here:
+        textSearch.setText("");
+    }//GEN-LAST:event_textSearchMouseClicked
+
+    private void textSearchKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_textSearchKeyPressed
+        // TODO add your handling code here:
+        String keywords = textSearch.getText();
+        String searchBy = comboBoxSearchBy.getSelectedItem().toString();
+        if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
+            Search(keywords, searchBy);
+        }
+    }//GEN-LAST:event_textSearchKeyPressed
+
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
@@ -680,6 +754,7 @@ public class OrderCheckerFrame extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JComboBox comboBoxSearchBy;
     private javax.swing.JButton confirmOrderButton;
     private javax.swing.JMenuItem confirmedOrderMenuItem;
     private javax.swing.JMenuItem exitMenu;
@@ -695,6 +770,7 @@ public class OrderCheckerFrame extends javax.swing.JFrame {
     private javax.swing.JButton refreshButton;
     private javax.swing.JPanel tablePanel;
     private javax.swing.JLabel tableStatus;
+    private javax.swing.JTextField textSearch;
     private javax.swing.JLabel titleTotOrd;
     private javax.swing.JLabel totalOrderLabel;
     private javax.swing.JButton unconfirmOrderButton;

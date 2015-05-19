@@ -5,14 +5,17 @@ import Model.OrderForm;
 import View.Login.LoginForm;
 import MySQL.Koneksi.KoneksiMySQL;
 import java.awt.Font;
+import java.awt.event.KeyEvent;
 import java.awt.geom.RoundRectangle2D;
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.time.LocalDate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
+import net.proteanit.sql.DbUtils;
 
 /**
  *
@@ -35,28 +38,60 @@ public class OrderMenu extends javax.swing.JFrame {
         orderTable.setShowHorizontalLines(false);
         notification();
     }
-    
-    public void notification(){
-        int confirmedOrder=0;
-        for(int i=0;i<orderTable.getRowCount();i++){
-            if(orderTable.getValueAt(i,8).toString().equalsIgnoreCase("Confirmed")){
+
+    private void Search(String keywords, String searchBy) {
+
+        if (keywords.equals("")) {
+            dao.setTableData(userSession, orderTable);
+        } else {
+            if (searchBy.equalsIgnoreCase("Order ID")) {
+                searchBy = "order_id";
+            }
+            try {
+                Connection c = new KoneksiMySQL().getConnection();
+                Statement st = c.createStatement();
+                String sql = "SELECT `order_id`, `order_date`, `oder_type`, `order_pickup_address`, `oder_destination_address`, `order_goods_type`, `order_goods_amount`, `unit`,`order_status` FROM `deliverit_main`.`order_data` WHERE `" + searchBy + "` LIKE '" + keywords + "'";
+                ResultSet rs = st.executeQuery(sql);
+                String columnHeader[] = {"Order ID", "Order Date", "Order Type", "Pickup Address", "Destination Address", "Goods Type", "Goods Amount", "Unit", "Order Status"};
+                orderTable.setModel(DbUtils.resultSetToTableModel(rs));
+
+                for (int i = 0; i < orderTable.getColumnModel().getColumnCount(); i++) {
+                    orderTable.getColumnModel().getColumn(i).setHeaderValue(columnHeader[i]);
+                }
+                for (int i = 0; i < orderTable.getRowCount(); i++) {
+                    if (orderTable.getValueAt(i, 8).toString().equalsIgnoreCase("false")) {
+                        orderTable.setValueAt("Pending", i, 8);
+                    } else {
+                        orderTable.setValueAt("Confirmed", i, 8);
+                    }
+                }
+            } catch (SQLException ex) {
+                Logger.getLogger(OrderMenu.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }
+
+    public void notification() {
+        int confirmedOrder = 0;
+        for (int i = 0; i < orderTable.getRowCount(); i++) {
+            if (orderTable.getValueAt(i, 8).toString().equalsIgnoreCase("Confirmed")) {
                 confirmedOrder++;
             }
         }
-        if(confirmedOrder!=0){
-            notificationLabel.setText(confirmedOrder+" Order Confirmed !");
-        }else{
+        if (confirmedOrder != 0) {
+            notificationLabel.setText(confirmedOrder + " Order Confirmed !");
+        } else {
             notificationLabel.setText("");
         }
     }
-    
+
     private void payOrder(String newUserSession) {
 
         try {
             if (orderTable.getValueAt(orderTable.getSelectedRow(), 8).toString().equalsIgnoreCase("Pending")) {
                 JOptionPane.showMessageDialog(null, "Order Still Pending");
             } else {
-              new PaymentMenu(orderTable.getValueAt(orderTable.getSelectedRow(), 0).toString()).setVisible(true);
+                new PaymentMenu(orderTable.getValueAt(orderTable.getSelectedRow(), 0).toString()).setVisible(true);
             }
         } catch (ArrayIndexOutOfBoundsException e) {
             JOptionPane.showMessageDialog(rootPane, "Order Not Selected");
@@ -196,6 +231,8 @@ public class OrderMenu extends javax.swing.JFrame {
         btnLogOut = new javax.swing.JButton();
         btnPayment = new javax.swing.JButton();
         notificationLabel = new javax.swing.JLabel();
+        textSearch = new javax.swing.JTextField();
+        comboBoxSearchBy = new javax.swing.JComboBox();
 
         orderForm.setTitle("Deliver IT | Order Form");
         orderForm.setBounds(new java.awt.Rectangle(0, 0, 0, 0));
@@ -504,6 +541,23 @@ public class OrderMenu extends javax.swing.JFrame {
             }
         });
 
+        textSearch.setText("Search");
+        textSearch.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                textSearchMouseClicked(evt);
+            }
+        });
+        textSearch.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                textSearchKeyPressed(evt);
+            }
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                textSearchKeyTyped(evt);
+            }
+        });
+
+        comboBoxSearchBy.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Order ID" }));
+
         javax.swing.GroupLayout mainPanelLayout = new javax.swing.GroupLayout(mainPanel);
         mainPanel.setLayout(mainPanelLayout);
         mainPanelLayout.setHorizontalGroup(
@@ -524,8 +578,13 @@ public class OrderMenu extends javax.swing.JFrame {
                             .addComponent(btnLogOut, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(btnPayment, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addGap(18, 18, 18)
-                        .addGroup(mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel3, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 176, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGroup(mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, mainPanelLayout.createSequentialGroup()
+                                .addComponent(textSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 157, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(comboBoxSearchBy, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 176, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 700, javax.swing.GroupLayout.PREFERRED_SIZE))))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
@@ -537,7 +596,10 @@ public class OrderMenu extends javax.swing.JFrame {
                     .addComponent(welcomeLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(notificationLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addGap(11, 11, 11)
-                .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(textSearch, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(comboBoxSearchBy, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(mainPanelLayout.createSequentialGroup()
@@ -668,15 +730,15 @@ public class OrderMenu extends javax.swing.JFrame {
 
     private void mainPanelMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_mainPanelMousePressed
         // TODO add your handling code here:
-        mouseX=evt.getX();
-        mouseY=evt.getY();
+        mouseX = evt.getX();
+        mouseY = evt.getY();
     }//GEN-LAST:event_mainPanelMousePressed
 
     private void mainPanelMouseDragged(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_mainPanelMouseDragged
         // TODO add your handling code here:
-        int x=evt.getXOnScreen();
-        int y=evt.getYOnScreen();
-        this.setLocation(x-mouseX, y-mouseY);
+        int x = evt.getXOnScreen();
+        int y = evt.getYOnScreen();
+        this.setLocation(x - mouseX, y - mouseY);
     }//GEN-LAST:event_mainPanelMouseDragged
 
     private void notificationLabelMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_notificationLabelMouseEntered
@@ -687,6 +749,25 @@ public class OrderMenu extends javax.swing.JFrame {
         // TODO add your handling code here:
         notificationLabel.setFont(new java.awt.Font("Calibri", 0, 18));
     }//GEN-LAST:event_notificationLabelMouseExited
+
+    private void textSearchMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_textSearchMouseClicked
+        // TODO add your handling code here:
+        textSearch.setText("");
+    }//GEN-LAST:event_textSearchMouseClicked
+
+    private void textSearchKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_textSearchKeyTyped
+        // TODO add your handling code here:
+
+    }//GEN-LAST:event_textSearchKeyTyped
+
+    private void textSearchKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_textSearchKeyPressed
+        // TODO add your handling code here:
+        if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
+            String keywords = textSearch.getText();
+            String searchBy = comboBoxSearchBy.getSelectedItem().toString();
+            Search(keywords, searchBy);
+        }
+    }//GEN-LAST:event_textSearchKeyPressed
 
     /**
      * @param args the command line arguments
@@ -741,6 +822,7 @@ public class OrderMenu extends javax.swing.JFrame {
     private javax.swing.JButton btnSubmit;
     private javax.swing.JComboBox cmbBoxGoodsUnit;
     private javax.swing.JComboBox combDelivType;
+    private javax.swing.JComboBox comboBoxSearchBy;
     private javax.swing.JLabel delivTypeLabel;
     private javax.swing.JComboBox goodsTypeComb;
     private javax.swing.JButton jButton1;
@@ -758,6 +840,7 @@ public class OrderMenu extends javax.swing.JFrame {
     private javax.swing.JTable orderTable;
     private javax.swing.JLabel orderTitleLabel;
     private javax.swing.JTextField textGoodsAmount;
+    private javax.swing.JTextField textSearch;
     private javax.swing.JTextField txtDestAdd;
     private javax.swing.JTextField txtPickupAddress;
     private javax.swing.JLabel welcomeLabel;
