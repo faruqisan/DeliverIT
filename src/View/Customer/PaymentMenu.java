@@ -34,6 +34,7 @@ public class PaymentMenu extends javax.swing.JFrame {
             billPayment.setPaymentMethod(comboBoxPaymentMethod.getSelectedItem().toString());
             billPayment.setBankAccount(textBankAccount.getText());
             payToBank();
+            setOrderForm(orderID);
             setPaymentForm(orderID);
             showReport();
         } catch (NullPointerException e) {

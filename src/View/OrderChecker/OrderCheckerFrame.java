@@ -50,8 +50,21 @@ public class OrderCheckerFrame extends javax.swing.JFrame {
         if (keywords.equals("")) {
             setTableDataUnconfirmed();
         } else {
-            if (searchBy.equalsIgnoreCase("Order ID")) {
-                searchBy = "order_id";
+            switch (searchBy) {
+                case "Order ID":
+                    searchBy = "order_id";
+                    break;
+                case "Order Status":
+                    if (keywords.equalsIgnoreCase("pending")) {
+                        keywords = "0";
+                    } else {
+                        keywords = "1";
+                    }
+                    searchBy = "order_status";
+                    break;
+                case "User Ordered":
+                    searchBy = "userOrdered";
+                default:
             }
             try {
                 String sql = "SELECT * FROM ORDER_DATA WHERE `" + searchBy + "` LIKE '" + keywords + "'";
@@ -394,7 +407,7 @@ public class OrderCheckerFrame extends javax.swing.JFrame {
             }
         });
 
-        comboBoxSearchBy.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Order ID" }));
+        comboBoxSearchBy.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Order ID", "Order Status", "User Ordered" }));
 
         javax.swing.GroupLayout tablePanelLayout = new javax.swing.GroupLayout(tablePanel);
         tablePanel.setLayout(tablePanelLayout);

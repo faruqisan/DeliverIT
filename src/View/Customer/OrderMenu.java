@@ -44,13 +44,27 @@ public class OrderMenu extends javax.swing.JFrame {
         if (keywords.equals("")) {
             dao.setTableData(userSession, orderTable);
         } else {
-            if (searchBy.equalsIgnoreCase("Order ID")) {
-                searchBy = "order_id";
+            
+            switch(searchBy){
+                case "Order ID":
+                    searchBy = "order_id";
+                    break;
+                case "Order Status":
+                    if(keywords.equalsIgnoreCase("pending")){
+                        keywords="0";
+                    }else{
+                        keywords="1";
+                    }
+                    searchBy = "order_status";
+                    break;
+                default:
+                    
             }
+
             try {
                 Connection c = new KoneksiMySQL().getConnection();
                 Statement st = c.createStatement();
-                String sql = "SELECT `order_id`, `order_date`, `oder_type`, `order_pickup_address`, `oder_destination_address`, `order_goods_type`, `order_goods_amount`, `unit`,`order_status` FROM `deliverit_main`.`order_data` WHERE `" + searchBy + "` LIKE '" + keywords + "'";
+                String sql = "SELECT `order_id`, `order_date`, `oder_type`, `order_pickup_address`, `oder_destination_address`, `order_goods_type`, `order_goods_amount`, `unit`,`order_status` FROM `deliverit_main`.`order_data` WHERE `userOrdered`='"+userSession+"' AND`" + searchBy + "` LIKE '" + keywords + "'";
                 ResultSet rs = st.executeQuery(sql);
                 String columnHeader[] = {"Order ID", "Order Date", "Order Type", "Pickup Address", "Destination Address", "Goods Type", "Goods Amount", "Unit", "Order Status"};
                 orderTable.setModel(DbUtils.resultSetToTableModel(rs));
@@ -556,7 +570,7 @@ public class OrderMenu extends javax.swing.JFrame {
             }
         });
 
-        comboBoxSearchBy.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Order ID" }));
+        comboBoxSearchBy.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Order ID", "Order Status" }));
 
         javax.swing.GroupLayout mainPanelLayout = new javax.swing.GroupLayout(mainPanel);
         mainPanel.setLayout(mainPanelLayout);
