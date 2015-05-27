@@ -16,11 +16,10 @@ public class KoneksiMySQL {
             Class.forName(JDBC_DRIVER);
             con=DriverManager.getConnection(dbUrl,dbUn,dbPs);
         }catch(ClassNotFoundException e){
-            //System.out.println(e.getMessage());
+            
             JOptionPane.showMessageDialog(null, "Server Database Error");
         }catch(SQLException e){
-            //System.out.println(e.getMessage());
-            //JOptionPane.showMessageDialog(null, "Not Connected to the Server");
+            
             new ConnectionMessage().setVisible(true);
         }
         
